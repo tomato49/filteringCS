@@ -51,11 +51,14 @@
     --teal-bg: rgba(15,118,110,0.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
   body {
     font-family: 'Noto Sans JP', sans-serif;
     background: var(--bg);
     color: var(--text);
-    min-height: 100vh;
     font-size: 13px;
   }
 
