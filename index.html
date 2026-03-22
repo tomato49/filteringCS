@@ -30,11 +30,11 @@
     --radius-lg: 12px;
   }
   :root.light {
-    --bg: #eeeef2;
-    --surface: #f5f5f8;
-    --surface2: #ebebef;
-    --border: #dddde8;
-    --border2: #c8c8d8;
+    --bg: #e2e2e8;
+    --surface: #eaeaee;
+    --surface2: #dddde4;
+    --border: #ceceda;
+    --border2: #b8b8c8;
     --text: #1a1a2e;
     --text2: #4a4a6a;
     --text3: #8888a8;
@@ -609,7 +609,18 @@ function renderAbilityFilters() {
 }
 
 // ===== 技能名の正規化（共通） =====
+// （）なしでまとめて扱う技能
+const GROUP_SKILLS = new Set(['操縦','芸術','製作','運転','母国語']);
+
+// プルダウン・フィルター用：GROUP_SKILLSは親名のみ
 function skillFullName(sk) {
+  const add = sk.additionalName || '';
+  if (GROUP_SKILLS.has(sk.name)) return sk.name;
+  return sk.name + (add ? '（' + add + '）' : '');
+}
+
+// カード表示用：常に（）込み
+function skillDisplayName(sk) {
   const add = sk.additionalName || '';
   return sk.name + (add ? '（' + add + '）' : '');
 }
@@ -653,7 +664,13 @@ function collectSkillsByCategory() {
       const skills = d[cat];
       if (!skills) return;
       [...(skills.static || []), ...(skills.additional || [])].forEach(sk => {
-        if (sk.name) result[cat].add(skillFullName(sk));
+        if (!sk.name) return;
+        // GROUP_SKILLSは親名のみ登録、（）付きは無視
+        if (GROUP_SKILLS.has(sk.name)) {
+          result[cat].add(sk.name);
+        } else {
+          result[cat].add(skillDisplayName(sk));
+        }
       });
     });
   });
@@ -727,17 +744,21 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 // ===== Get skill value =====
 function getSkillValue(ch, rawName) {
   const d = ch.data;
+  const isGroup = GROUP_SKILLS.has(rawName);
+  let best = null;
   for (const cat of CAT_ORDER) {
     const skills = d[cat];
     if (!skills) continue;
     const all = [...(skills.static || []), ...(skills.additional || [])];
     for (const sk of all) {
-      if (skillFullName(sk) === rawName) {
-        return (sk.defaultPoint||0) + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
+      const match = isGroup ? sk.name === rawName : skillFullName(sk) === rawName;
+      if (match) {
+        const val = (sk.defaultPoint||0) + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
+        if (best === null || val > best) best = val;
       }
     }
   }
-  return null;
+  return best;
 }
 
 // ===== Get ability value =====
@@ -757,16 +778,20 @@ function getTopSkills(ch, highlightNames) {
     if (!skills) return;
     [...(skills.static||[]), ...(skills.additional||[])].forEach(sk => {
       const val = (sk.defaultPoint||0)+(sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0);
-      const fullName = skillFullName(sk);
-      // Only include if has meaningful points (not just default)
-      if ((sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0) > 0) {
-        all.push({ name: fullName, val });
+      const fullName = skillDisplayName(sk);
+      const baseName = fullName.replace(/（.*）$/, '');
+      const isHighlighted = highlightNames.has(fullName) || (GROUP_SKILLS.has(baseName) && highlightNames.has(baseName));
+      // フィルター対象技能は値に関わらず含める、それ以外はデフォルト以外の点がある場合のみ
+      if (isHighlighted || (sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0) > 0) {
+        all.push({ name: fullName, val, isHighlighted });
       }
     });
   });
   all.sort((a,b) => b.val - a.val);
-  // top 6
-  return all.slice(0,6);
+  // フィルター対象は必ず含め、残りはtop6まで
+  const highlighted = all.filter(s => s.isHighlighted);
+  const others = all.filter(s => !s.isHighlighted).slice(0, Math.max(0, 6 - highlighted.length));
+  return [...highlighted, ...others].sort((a,b) => b.val - a.val);
 }
 
 // ===== Render =====
@@ -838,7 +863,9 @@ function renderCards() {
     // Skills
     const topSkills = getTopSkills(ch, hlNames);
     const skillHtml = topSkills.map(s => {
-      const isHl = hlNames.has(s.name);
+      // GROUP_SKILLSのフィルターは親名だけで照合
+      const baseName = s.name.replace(/（.*）$/, '');
+      const isHl = hlNames.has(s.name) || (GROUP_SKILLS.has(baseName) && hlNames.has(baseName));
       return `<span class="skill-pill${isHl ? ' highlight' : ''}">${s.name} ${s.val}</span>`;
     }).join('');
 
