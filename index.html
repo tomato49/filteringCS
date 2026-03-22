@@ -431,8 +431,8 @@
 <div class="header">
   <div class="header-title">CoC<span> / </span>character viewer</div>
   <div class="ver-tabs">
-    <button class="ver-tab active" data-ver="7">7版</button>
-    <button class="ver-tab" data-ver="6">6版</button>
+    <button class="ver-tab" data-ver="7">7版</button>
+    <button class="ver-tab active" data-ver="6">6版</button>
   </div>
 </div>
 
@@ -467,6 +467,14 @@
 
     <div class="sidebar-section">
       <button class="reset-btn" id="resetBtn">フィルターをリセット</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+        <span style="font-size:12px;color:var(--text2);">ロスト探索者を表示</span>
+        <label style="position:relative;display:inline-block;width:36px;height:20px;cursor:pointer;">
+          <input type="checkbox" id="showLost" checked style="opacity:0;width:0;height:0;position:absolute;" />
+          <span id="toggleTrack" style="position:absolute;inset:0;border-radius:20px;background:var(--accent);transition:background 0.2s;"></span>
+          <span id="toggleThumb" style="position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform 0.2s;transform:translateX(16px);"></span>
+        </label>
+      </div>
     </div>
   </div>
 
@@ -490,7 +498,7 @@
 <script>
 // ===== State =====
 let allChars = [];
-let currentVer = '7';
+let currentVer = '6';
 let skillFilters = []; // [{name, threshold}]
 let abilityMinMap = {}; // {STR: 30, ...}
 
@@ -653,6 +661,17 @@ function renderSkillTags() {
   });
 }
 
+// ===== Lost toggle =====
+const showLostCb = document.getElementById('showLost');
+const toggleThumb = document.getElementById('toggleThumb');
+const toggleTrack = document.getElementById('toggleTrack');
+showLostCb.addEventListener('change', () => {
+  const on = showLostCb.checked;
+  toggleThumb.style.transform = on ? 'translateX(16px)' : 'translateX(3px)';
+  toggleTrack.style.background = on ? 'var(--accent)' : 'var(--border2)';
+  renderCards();
+});
+
 // ===== Name search =====
 document.getElementById('nameSearch').addEventListener('input', renderCards);
 
@@ -724,6 +743,9 @@ function renderCards() {
     const name = (ch.data?.profile?.name || ch.name || '').toLowerCase();
     const furi = (ch.data?.profile?.furi || '').toLowerCase();
     if (nameQ && !name.includes(nameQ) && !furi.includes(nameQ)) return false;
+
+    // Lost filter
+    if (!document.getElementById('showLost').checked && ch.data?.profile?.isLost) return false;
 
     // Ability filters
     for (const [ab, minVal] of Object.entries(abilityMinMap)) {
@@ -797,6 +819,9 @@ function renderCards() {
           ${subParts.length ? `<div class="card-sub">${subParts.join(' ｜ ')}</div>` : ''}
         </div>
         <div class="ver-badge">${currentVer}版</div>
+        <a href="https://iachara.com/view/${ch.id}" target="_blank" rel="noopener" title="キャラクターページを開く" style="display:flex;align-items:center;color:var(--text3);text-decoration:none;margin-left:4px;flex-shrink:0;transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
       </div>
       <div class="ability-chips">${abChips}</div>
       <div class="skill-pills">${skillHtml || '<span style="font-size:11px;color:var(--text3);">技能データなし</span>'}</div>
