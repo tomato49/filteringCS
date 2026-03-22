@@ -7,16 +7,16 @@ let abilityMinMap = {}; // {STR: 30, ...}
 // 7版 vs 6版で表示する能力値とスライダー最大値
 const VER_CONFIG = {
   '7': {
-    abilities: ['STR','DEX','INT','POW','CON','EDU','APP','SIZ','LUK'],
+    abilities: ['STR','CON','POW','DEX','APP','SIZ','INT','EDU','LUK'],
     abMax: 90,
     abMaxOverride: { EDU: 99 },
-    abilityKeys: { STR:'str', DEX:'dex', INT:'int', POW:'pow', CON:'con', EDU:'edu', APP:'app', SIZ:'siz', LUK:'luck' }
+    abilityKeys: { STR:'str', CON:'con', POW:'pow', DEX:'dex', APP:'app', SIZ:'siz', INT:'int', EDU:'edu', LUK:'luck' }
   },
   '6': {
-    abilities: ['STR','DEX','INT','POW','CON','EDU','APP','SIZ'],
+    abilities: ['STR','CON','POW','DEX','APP','SIZ','INT','EDU'],
     abMax: 18,
     abMaxOverride: { EDU: 21 },
-    abilityKeys: { STR:'str', DEX:'dex', INT:'int', POW:'pow', CON:'con', EDU:'edu', APP:'app', SIZ:'siz' }
+    abilityKeys: { STR:'str', CON:'con', POW:'pow', DEX:'dex', APP:'app', SIZ:'siz', INT:'int', EDU:'edu' }
   }
 };
 
