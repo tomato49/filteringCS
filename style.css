@@ -443,6 +443,16 @@
     flex-shrink: 0;
   }
   .card-name { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .san-chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--red-bg);
+    border: 1px solid var(--red);
+    color: var(--red);
+  }
+  .san-chip b { color: var(--red); font-weight: 700; }
   .card-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
   .ver-badge {
     font-family: 'Space Mono', monospace;

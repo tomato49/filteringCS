@@ -54,6 +54,14 @@ document.querySelectorAll('.ver-tab').forEach(btn => {
   });
 });
 
+// ===== SAN filter =====
+document.getElementById('sanRange').addEventListener('input', e => {
+  const v = parseInt(e.target.value);
+  abilityMinMap['SAN'] = v;
+  document.getElementById('abval-SAN').textContent = v > 0 ? v + '以上' : '指定なし';
+  renderCards();
+});
+
 // ===== Ability filters =====
 function renderAbilityFilters() {
   const cfg = VER_CONFIG[currentVer];
@@ -315,6 +323,8 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   skillFilters = [];
   document.getElementById('nameSearch').value = '';
   document.getElementById('skillFilterTags').innerHTML = '';
+  document.getElementById('sanRange').value = 0;
+  document.getElementById('abval-SAN').textContent = '指定なし';
   renderAbilityFilters();
   renderCards();
 });
@@ -341,6 +351,7 @@ function getSkillValue(ch, rawName) {
 
 // ===== Get ability value =====
 function getAbilityValue(ch, abKey) {
+  if (abKey === 'san') return ch.data?.abilities?.sanCurrent ?? 0;
   const v = ch.data?.abilities?.[abKey];
   if (!v) return 0;
   return (v.value || 0) + (v.fixedDiff || 0) + (v.tmpFixedDiff || 0);
@@ -392,6 +403,11 @@ function renderCards() {
     // Ability filters
     for (const [ab, minVal] of Object.entries(abilityMinMap)) {
       if (minVal <= 0) continue;
+      if (ab === 'SAN') {
+        const sanVal = ch.data?.abilities?.sanCurrent ?? 0;
+        if (sanVal < minVal) return false;
+        continue;
+      }
       const key = cfg.abilityKeys[ab];
       if (!key) continue;
       if (getAbilityValue(ch, key) < minVal) return false;
@@ -427,6 +443,7 @@ function renderCards() {
     const sex = prof.sex || '';
     const profession = prof.profession || '';
     const isLost = prof.isLost;
+    const sanVal = ch.data?.abilities?.sanCurrent ?? '';
 
     // Card background image
     const initials = name.replace(/[（(].*/, '').trim().slice(0,2);
@@ -473,7 +490,10 @@ function renderCards() {
           ${subParts.length ? `<div class="card-sub">${subParts.join(' ｜ ')}</div>` : ''}
         </div>
       </div>
-      <div class="ability-chips">${abChips}</div>
+      <div class="ability-chips">
+        ${sanVal !== '' ? `<div class="san-chip">SAN <b>${sanVal}</b></div><div style="width:100%;"></div>` : ''}
+        ${abChips}
+      </div>
       <div class="skill-pills">${skillHtml || '<span style="font-size:11px;color:var(--text3);">技能データなし</span>'}</div>
     `;
     if (iconUrl) {
