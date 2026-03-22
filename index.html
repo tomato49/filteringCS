@@ -30,9 +30,9 @@
     --radius-lg: 12px;
   }
   :root.light {
-    --bg: #f4f4f7;
-    --surface: #ffffff;
-    --surface2: #f0f0f4;
+    --bg: #eeeef2;
+    --surface: #f5f5f8;
+    --surface2: #ebebef;
     --border: #dddde8;
     --border2: #c8c8d8;
     --text: #1a1a2e;
@@ -372,6 +372,8 @@
     transition: border-color 0.15s, transform 0.1s;
   }
   .char-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+  .char-card.is-lost { border-left: 3px solid var(--red); }
+  .char-card.is-lost { border-left: 3px solid var(--red); }
   .card-top {
     display: flex;
     align-items: center;
@@ -448,16 +450,7 @@
     font-size: 13px;
   }
 
-  /* Lost badge */
-  .lost-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--red);
-    display: inline-block;
-    margin-right: 4px;
-    vertical-align: middle;
-  }
+
 </style>
 </head>
 <body>
@@ -856,12 +849,12 @@ function renderCards() {
     if (profession) subParts.push(profession);
 
     const card = document.createElement('div');
-    card.className = 'char-card';
+    card.className = 'char-card' + (isLost ? ' is-lost' : '');
     card.innerHTML = `
       <div class="card-top">
         <div class="avatar">${initials}</div>
         <div style="flex:1;min-width:0;">
-          <div class="card-name">${isLost ? '<span class="lost-dot"></span>' : ''}${name}</div>
+          <div class="card-name">${name}</div>
           ${subParts.length ? `<div class="card-sub">${subParts.join(' ｜ ')}</div>` : ''}
         </div>
         <div class="ver-badge">${currentVer}版</div>
