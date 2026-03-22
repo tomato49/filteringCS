@@ -201,8 +201,9 @@
     gap: 6px;
     margin-bottom: 8px;
   }
-  .skill-select {
-    flex: 1;
+  .skill-combo { position: relative; flex: 1; }
+  .skill-combo-input {
+    width: 100%;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -211,9 +212,41 @@
     font-size: 11px;
     padding: 6px 8px;
     outline: none;
-    cursor: pointer;
+    cursor: text;
+    transition: border-color 0.15s;
   }
-  .skill-select:focus { border-color: var(--accent); }
+  .skill-combo-input:focus { border-color: var(--accent); }
+  .skill-combo-input::placeholder { color: var(--text3); }
+  .skill-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 3px);
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  .skill-dropdown.open { display: block; }
+  .skill-dropdown-group {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    padding: 6px 8px 3px;
+    letter-spacing: 0.06em;
+  }
+  .skill-dropdown-item {
+    font-size: 11px;
+    padding: 5px 10px;
+    cursor: pointer;
+    color: var(--text);
+    transition: background 0.1s;
+  }
+  .skill-dropdown-item:hover, .skill-dropdown-item.active { background: var(--accent-bg); color: var(--accent2); }
+  .skill-dropdown-empty { font-size: 11px; padding: 8px 10px; color: var(--text3); }
   .add-btn {
     background: var(--accent-bg);
     border: 1px solid var(--accent);
@@ -484,9 +517,10 @@
     <div class="sidebar-section">
       <div class="sec-label">技能フィルター</div>
       <div class="skill-filter-row" style="flex-direction:column;">
-        <select class="skill-select" id="skillSelect" style="width:100%;">
-          <option value="">技能を選択...</option>
-        </select>
+      <div class="skill-combo">
+        <input type="text" class="skill-combo-input" id="skillComboInput" placeholder="技能を検索..." autocomplete="off" />
+        <div class="skill-dropdown" id="skillDropdown"></div>
+      </div>
         <button class="add-btn" id="addSkillFilter" style="width:100%;text-align:center;">+ 追加</button>
       </div>
       <div class="skill-threshold-row">
@@ -680,18 +714,124 @@ function collectSkillsByCategory() {
   return result;
 }
 
+// ===== Custom skill combobox =====
+let allSkillOptions = []; // [{cat, name}]
+let selectedSkillName = '';
+let activeIndex = -1;
+
+function buildSkillSelect() {
+  const bycat = collectSkillsByCategory();
+  allSkillOptions = [];
+  CAT_ORDER.forEach(cat => {
+    const names = bycat[cat];
+    if (!names || names.length === 0) return;
+    names.sort((a,b) => a.localeCompare(b, 'ja')).forEach(name => {
+      allSkillOptions.push({ cat, name });
+    });
+  });
+  selectedSkillName = '';
+  document.getElementById('skillComboInput').value = '';
+  renderDropdown('');
+}
+
+function renderDropdown(query) {
+  const dropdown = document.getElementById('skillDropdown');
+  const q = query.trim().toLowerCase();
+  const filtered = q ? allSkillOptions.filter(o => o.name.toLowerCase().includes(q)) : allSkillOptions;
+
+  if (filtered.length === 0) {
+    dropdown.innerHTML = '<div class="skill-dropdown-empty">該当なし</div>';
+    return;
+  }
+
+  let html = '';
+  let lastCat = null;
+  filtered.forEach((o, i) => {
+    if (o.cat !== lastCat) {
+      html += `<div class="skill-dropdown-group">${CAT_LABELS[o.cat]}</div>`;
+      lastCat = o.cat;
+    }
+    html += `<div class="skill-dropdown-item" data-name="${o.name}" data-i="${i}">${o.name}</div>`;
+  });
+  dropdown.innerHTML = html;
+  activeIndex = -1;
+
+  dropdown.querySelectorAll('.skill-dropdown-item').forEach(el => {
+    el.addEventListener('mousedown', e => {
+      e.preventDefault();
+      selectSkill(el.dataset.name);
+    });
+  });
+}
+
+let suppressInput = false;
+
+function selectSkill(name) {
+  selectedSkillName = name;
+  suppressInput = true;
+  document.getElementById('skillComboInput').value = name;
+  suppressInput = false;
+  document.getElementById('skillDropdown').classList.remove('open');
+}
+
+const comboInput = document.getElementById('skillComboInput');
+const dropdown = document.getElementById('skillDropdown');
+
+comboInput.addEventListener('focus', () => {
+  renderDropdown(comboInput.value);
+  dropdown.classList.add('open');
+});
+comboInput.addEventListener('blur', () => {
+  setTimeout(() => dropdown.classList.remove('open'), 150);
+});
+comboInput.addEventListener('input', () => {
+  if (suppressInput) return;
+  selectedSkillName = '';
+  renderDropdown(comboInput.value);
+  dropdown.classList.add('open');
+});
+let isComposing = false;
+comboInput.addEventListener('compositionstart', () => { isComposing = true; });
+comboInput.addEventListener('compositionend', () => { isComposing = false; });
+
+comboInput.addEventListener('keydown', e => {
+  if (isComposing) return;
+  const items = dropdown.querySelectorAll('.skill-dropdown-item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeIndex = Math.min(activeIndex + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+    items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeIndex = Math.max(activeIndex - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+    items[activeIndex]?.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (activeIndex >= 0 && items[activeIndex]) {
+      selectSkill(items[activeIndex].dataset.name);
+    } else if (items.length >= 1) {
+      selectSkill(items[0].dataset.name);
+    }
+  } else if (e.key === 'Escape') {
+    dropdown.classList.remove('open');
+  }
+});
+
 // ===== Skill threshold =====
 document.getElementById('skillThreshold').addEventListener('input', e => {
   document.getElementById('skillThreshVal').textContent = e.target.value + '以上';
 });
 
 document.getElementById('addSkillFilter').addEventListener('click', () => {
-  const sel = document.getElementById('skillSelect');
-  const name = sel.value;
+  const name = selectedSkillName || comboInput.value.trim();
   if (!name) return;
   const threshold = parseInt(document.getElementById('skillThreshold').value);
   if (skillFilters.some(f => f.name === name)) return;
   skillFilters.push({ name, threshold });
+  selectedSkillName = '';
+  comboInput.value = '';
   renderSkillTags();
   renderCards();
 });
