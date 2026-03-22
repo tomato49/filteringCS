@@ -538,12 +538,14 @@ let abilityMinMap = {}; // {STR: 30, ...}
 const VER_CONFIG = {
   '7': {
     abilities: ['STR','DEX','INT','POW','CON','EDU','APP','SIZ','LUK'],
-    abMax: 100,
+    abMax: 90,
+    abMaxOverride: { EDU: 99 },
     abilityKeys: { STR:'str', DEX:'dex', INT:'int', POW:'pow', CON:'con', EDU:'edu', APP:'app', SIZ:'siz', LUK:'luck' }
   },
   '6': {
     abilities: ['STR','DEX','INT','POW','CON','EDU','APP','SIZ'],
-    abMax: 21,
+    abMax: 18,
+    abMaxOverride: { EDU: 21 },
     abilityKeys: { STR:'str', DEX:'dex', INT:'int', POW:'pow', CON:'con', EDU:'edu', APP:'app', SIZ:'siz' }
   }
 };
@@ -596,7 +598,7 @@ function renderAbilityFilters() {
         <span class="ability-name">${ab}</span>
         <span class="ability-val" id="abval-${ab}">${min > 0 ? min + '以上' : '指定なし'}</span>
       </div>
-      <input type="range" min="0" max="${cfg.abMax}" value="${min}" step="1" data-ab="${ab}" />
+      <input type="range" min="0" max="${(cfg.abMaxOverride && cfg.abMaxOverride[ab]) || cfg.abMax}" value="${min}" step="1" data-ab="${ab}" />
     `;
     div.querySelector('input').addEventListener('input', e => {
       const v = parseInt(e.target.value);
