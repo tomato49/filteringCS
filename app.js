@@ -302,7 +302,7 @@ const toggleTrack = document.getElementById('toggleTrack');
 showLostCb.addEventListener('change', () => {
   const on = showLostCb.checked;
   toggleThumb.style.transform = on ? 'translateX(16px)' : 'translateX(3px)';
-  toggleTrack.style.background = on ? 'var(--accent)' : 'var(--border2)';
+  toggleTrack.style.background = on ? 'var(--red)' : 'var(--border2)';
   renderCards();
 });
 
