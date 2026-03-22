@@ -476,4 +476,4 @@ function renderCards() {
 
 // Init
 renderAbilityFilters();
-</script>
+
