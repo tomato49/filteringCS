@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>キャラクタービューワー</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f11;
+    --surface: #18181c;
+    --surface2: #22222a;
+    --border: #2e2e3a;
+    --border2: #3d3d50;
+    --text: #e8e8f0;
+    --text2: #8888a0;
+    --text3: #55556a;
+    --accent: #7c6af7;
+    --accent2: #a99ff8;
+    --accent-bg: rgba(124,106,247,0.12);
+    --green: #4ade80;
+    --green-bg: rgba(74,222,128,0.1);
+    --amber: #fbbf24;
+    --amber-bg: rgba(251,191,36,0.1);
+    --red: #f87171;
+    --red-bg: rgba(248,113,113,0.1);
+    --teal: #2dd4bf;
+    --teal-bg: rgba(45,212,191,0.1);
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 13px;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+  }
+  .header-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.04em;
+  }
+  .header-title span { color: var(--text3); }
+
+  /* Version tabs */
+  .ver-tabs {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+  .ver-tab {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .ver-tab:hover { border-color: var(--accent); color: var(--accent2); }
+  .ver-tab.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent2); }
+
+  /* Layout */
+  .layout { display: flex; height: calc(100vh - 49px); }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .sidebar-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-section:last-child { border-bottom: none; }
+  .sec-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* Search */
+  .search-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    padding: 7px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+
+  /* Ability sliders */
+  .ability-row { margin-bottom: 10px; }
+  .ability-row:last-child { margin-bottom: 0; }
+  .ability-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .ability-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+  }
+  .ability-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    min-width: 36px;
+    text-align: right;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: var(--border2);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  /* Skill filter */
+  .skill-filter-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .skill-select {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    padding: 6px 8px;
+    outline: none;
+    cursor: pointer;
+  }
+  .skill-select:focus { border-color: var(--accent); }
+  .add-btn {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    color: var(--accent2);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .add-btn:hover { background: rgba(124,106,247,0.22); }
+
+  .skill-threshold-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .skill-thresh-label {
+    font-size: 11px;
+    color: var(--text2);
+    white-space: nowrap;
+  }
+  .skill-thresh-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    min-width: 28px;
+    text-align: right;
+  }
+
+  .filter-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .filter-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 3px 8px 3px 9px;
+    border-radius: 20px;
+    background: var(--teal-bg);
+    border: 1px solid rgba(45,212,191,0.3);
+    color: var(--teal);
+  }
+  .filter-tag-remove {
+    cursor: pointer;
+    color: var(--teal);
+    font-size: 13px;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.1s;
+  }
+  .filter-tag-remove:hover { opacity: 1; }
+
+  .reset-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text2);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    padding: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+  .reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* Main content */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .main-header {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .result-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .result-count b { color: var(--accent2); }
+
+  /* Paste area */
+  .paste-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px;
+  }
+  .paste-icon {
+    font-family: 'Space Mono', monospace;
+    font-size: 36px;
+    color: var(--border2);
+  }
+  .paste-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text2);
+  }
+  .paste-sub { font-size: 12px; color: var(--text3); text-align: center; line-height: 1.7; }
+  .paste-textarea {
+    width: 100%;
+    max-width: 500px;
+    height: 120px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 12px;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.15s;
+  }
+  .paste-textarea:focus { border-color: var(--accent); }
+  .paste-error { font-size: 12px; color: var(--red); }
+  .parse-btn {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    color: var(--accent2);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 24px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .parse-btn:hover { background: rgba(124,106,247,0.22); }
+
+  /* Card grid */
+  .card-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    align-content: start;
+  }
+
+  /* Character card */
+  .char-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .char-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--accent-bg);
+    border: 1px solid rgba(124,106,247,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent2);
+    flex-shrink: 0;
+  }
+  .card-name { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .card-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
+  .ver-badge {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    flex-shrink: 0;
+  }
+
+  /* Ability chips */
+  .ability-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 9px;
+  }
+  .ability-chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+  .ability-chip b { color: var(--text); font-weight: 700; }
+
+  /* Skill pills */
+  .skill-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+  .skill-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--green-bg);
+    border: 1px solid rgba(74,222,128,0.25);
+    color: var(--green);
+  }
+  .skill-pill.highlight {
+    background: var(--teal-bg);
+    border-color: rgba(45,212,191,0.35);
+    color: var(--teal);
+  }
+
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text3);
+    font-size: 13px;
+  }
+
+  /* Lost badge */
+  .lost-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">CoC<span> / </span>character viewer</div>
+  <div class="ver-tabs">
+    <button class="ver-tab active" data-ver="7">7版</button>
+    <button class="ver-tab" data-ver="6">6版</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sec-label">キャラクター検索</div>
+      <input type="text" class="search-input" id="nameSearch" placeholder="名前・フリガナ" />
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sec-label">能力値フィルター</div>
+      <div id="abilityFilters"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sec-label">技能フィルター</div>
+      <div class="skill-filter-row">
+        <select class="skill-select" id="skillSelect">
+          <option value="">技能を選択...</option>
+        </select>
+        <button class="add-btn" id="addSkillFilter">+ 追加</button>
+      </div>
+      <div class="skill-threshold-row">
+        <span class="skill-thresh-label">閾値：</span>
+        <input type="range" id="skillThreshold" min="0" max="100" value="50" step="1" style="flex:1;" />
+        <span class="skill-thresh-val" id="skillThreshVal">50以上</span>
+      </div>
+      <div class="filter-tags" id="skillFilterTags"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <button class="reset-btn" id="resetBtn">フィルターをリセット</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="main-header">
+      <span class="result-count" id="resultCount">データなし</span>
+    </div>
+    <div id="pasteArea" class="paste-area">
+      <div class="paste-icon">{  }</div>
+      <div class="paste-title">JSONを貼り付けてください</div>
+      <div class="paste-sub">キャラクターデータ（配列またはオブジェクト）を<br>テキストエリアに貼り付けてパースします</div>
+      <textarea class="paste-textarea" id="jsonInput" placeholder='[{ "id": ..., "data": { ... } }, ...]'></textarea>
+      <div class="paste-error" id="parseError"></div>
+      <button class="parse-btn" id="parseBtn">読み込む</button>
+    </div>
+    <div id="cardGrid" class="card-grid" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+// ===== State =====
+let allChars = [];
+let currentVer = '7';
+let skillFilters = []; // [{name, threshold}]
+let abilityMinMap = {}; // {STR: 30, ...}
+
+// 7版 vs 6版で表示する能力値とスライダー最大値
+const VER_CONFIG = {
+  '7': {
+    abilities: ['STR','DEX','INT','POW','CON','EDU','APP','SIZ','LUK'],
+    abMax: 100,
+    abilityKeys: { STR:'str', DEX:'dex', INT:'int', POW:'pow', CON:'con', EDU:'edu', APP:'app', SIZ:'siz', LUK:'luck' }
+  },
+  '6': {
+    abilities: ['STR','DEX','INT','POW','CON','EDU','APP','SIZ'],
+    abMax: 21,
+    abilityKeys: { STR:'str', DEX:'dex', INT:'int', POW:'pow', CON:'con', EDU:'edu', APP:'app', SIZ:'siz' }
+  }
+};
+
+// ===== Parse JSON =====
+document.getElementById('parseBtn').addEventListener('click', () => {
+  const raw = document.getElementById('jsonInput').value.trim();
+  const errEl = document.getElementById('parseError');
+  errEl.textContent = '';
+  try {
+    let parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) parsed = [parsed];
+    allChars = parsed;
+    document.getElementById('pasteArea').style.display = 'none';
+    document.getElementById('cardGrid').style.display = 'grid';
+    buildSkillSelect();
+    renderAbilityFilters();
+    renderCards();
+  } catch(e) {
+    errEl.textContent = 'JSONの解析に失敗しました: ' + e.message;
+  }
+});
+
+// ===== Version tabs =====
+document.querySelectorAll('.ver-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentVer = btn.dataset.ver;
+    document.querySelectorAll('.ver-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    abilityMinMap = {};
+    skillFilters = [];
+    document.getElementById('skillFilterTags').innerHTML = '';
+    renderAbilityFilters();
+    buildSkillSelect();
+    renderCards();
+  });
+});
+
+// ===== Ability filters =====
+function renderAbilityFilters() {
+  const cfg = VER_CONFIG[currentVer];
+  const container = document.getElementById('abilityFilters');
+  container.innerHTML = '';
+  cfg.abilities.forEach(ab => {
+    const min = abilityMinMap[ab] || 0;
+    const div = document.createElement('div');
+    div.className = 'ability-row';
+    div.innerHTML = `
+      <div class="ability-head">
+        <span class="ability-name">${ab}</span>
+        <span class="ability-val" id="abval-${ab}">${min > 0 ? min + '以上' : '指定なし'}</span>
+      </div>
+      <input type="range" min="0" max="${cfg.abMax}" value="${min}" step="1" data-ab="${ab}" />
+    `;
+    div.querySelector('input').addEventListener('input', e => {
+      const v = parseInt(e.target.value);
+      abilityMinMap[ab] = v;
+      document.getElementById('abval-' + ab).textContent = v > 0 ? v + '以上' : '指定なし';
+      renderCards();
+    });
+    container.appendChild(div);
+  });
+}
+
+// ===== Skill select =====
+function buildSkillSelect() {
+  const sel = document.getElementById('skillSelect');
+  sel.innerHTML = '<option value="">技能を選択...</option>';
+  const skills = collectAllSkills();
+  skills.sort().forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+
+function collectAllSkills() {
+  const names = new Set();
+  const filtered = allChars.filter(c => (c.data?.version || '7th').startsWith(currentVer));
+  filtered.forEach(ch => {
+    const d = ch.data;
+    ['actionSkills','battleSkills','searchSkills','knowledgeSkills','negotiationSkills'].forEach(cat => {
+      const skills = d[cat];
+      if (!skills) return;
+      [...(skills.static || []), ...(skills.additional || [])].forEach(sk => {
+        if (sk.name) names.add(sk.name + (sk.additionalName ? '（' + sk.additionalName + '）' : ''));
+      });
+    });
+  });
+  return [...names];
+}
+
+// ===== Skill threshold =====
+document.getElementById('skillThreshold').addEventListener('input', e => {
+  document.getElementById('skillThreshVal').textContent = e.target.value + '以上';
+});
+
+document.getElementById('addSkillFilter').addEventListener('click', () => {
+  const sel = document.getElementById('skillSelect');
+  const name = sel.value;
+  if (!name) return;
+  const threshold = parseInt(document.getElementById('skillThreshold').value);
+  if (skillFilters.some(f => f.name === name)) return;
+  skillFilters.push({ name, threshold });
+  renderSkillTags();
+  renderCards();
+});
+
+function renderSkillTags() {
+  const container = document.getElementById('skillFilterTags');
+  container.innerHTML = '';
+  skillFilters.forEach((f, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'filter-tag';
+    tag.innerHTML = `${f.name} ≥${f.threshold}<span class="filter-tag-remove" data-i="${i}">×</span>`;
+    tag.querySelector('.filter-tag-remove').addEventListener('click', () => {
+      skillFilters.splice(i, 1);
+      renderSkillTags();
+      renderCards();
+    });
+    container.appendChild(tag);
+  });
+}
+
+// ===== Name search =====
+document.getElementById('nameSearch').addEventListener('input', renderCards);
+
+// ===== Reset =====
+document.getElementById('resetBtn').addEventListener('click', () => {
+  abilityMinMap = {};
+  skillFilters = [];
+  document.getElementById('nameSearch').value = '';
+  document.getElementById('skillFilterTags').innerHTML = '';
+  renderAbilityFilters();
+  renderCards();
+});
+
+// ===== Get skill value =====
+function getSkillValue(ch, rawName) {
+  const d = ch.data;
+  const cats = ['actionSkills','battleSkills','searchSkills','knowledgeSkills','negotiationSkills'];
+  for (const cat of cats) {
+    const skills = d[cat];
+    if (!skills) continue;
+    const all = [...(skills.static || []), ...(skills.additional || [])];
+    for (const sk of all) {
+      const fullName = sk.name + (sk.additionalName ? '（' + sk.additionalName + '）' : '');
+      if (fullName === rawName || sk.name === rawName) {
+        return (sk.defaultPoint||0) + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
+      }
+    }
+  }
+  return null;
+}
+
+// ===== Get ability value =====
+function getAbilityValue(ch, abKey) {
+  const v = ch.data?.abilities?.[abKey];
+  if (!v) return 0;
+  return (v.value || 0) + (v.fixedDiff || 0) + (v.tmpFixedDiff || 0);
+}
+
+// ===== Get top skills =====
+function getTopSkills(ch, highlightNames) {
+  const d = ch.data;
+  const cats = ['actionSkills','battleSkills','searchSkills','knowledgeSkills','negotiationSkills'];
+  const all = [];
+  cats.forEach(cat => {
+    const skills = d[cat];
+    if (!skills) return;
+    [...(skills.static||[]), ...(skills.additional||[])].forEach(sk => {
+      const val = (sk.defaultPoint||0)+(sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0);
+      const fullName = sk.name + (sk.additionalName ? '（' + sk.additionalName + '）' : '');
+      // Only include if has meaningful points (not just default)
+      if ((sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0) > 0) {
+        all.push({ name: fullName, val });
+      }
+    });
+  });
+  all.sort((a,b) => b.val - a.val);
+  // top 6
+  return all.slice(0,6);
+}
+
+// ===== Render =====
+function renderCards() {
+  const cfg = VER_CONFIG[currentVer];
+  const nameQ = document.getElementById('nameSearch').value.trim().toLowerCase();
+
+  const filtered = allChars.filter(ch => {
+    const ver = (ch.data?.version || '7th').startsWith(currentVer);
+    if (!ver) return false;
+
+    // Name search
+    const name = (ch.data?.profile?.name || ch.name || '').toLowerCase();
+    const furi = (ch.data?.profile?.furi || '').toLowerCase();
+    if (nameQ && !name.includes(nameQ) && !furi.includes(nameQ)) return false;
+
+    // Ability filters
+    for (const [ab, minVal] of Object.entries(abilityMinMap)) {
+      if (minVal <= 0) continue;
+      const key = cfg.abilityKeys[ab];
+      if (!key) continue;
+      if (getAbilityValue(ch, key) < minVal) return false;
+    }
+
+    // Skill filters
+    for (const sf of skillFilters) {
+      const val = getSkillValue(ch, sf.name);
+      if (val === null || val < sf.threshold) return false;
+    }
+
+    return true;
+  });
+
+  const grid = document.getElementById('cardGrid');
+  const countEl = document.getElementById('resultCount');
+  const total = allChars.filter(c => (c.data?.version||'7th').startsWith(currentVer)).length;
+  countEl.innerHTML = `<b>${filtered.length}</b> / ${total} キャラクター`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty-state">条件に一致するキャラクターが見つかりません</div>';
+    return;
+  }
+
+  const hlNames = new Set(skillFilters.map(f => f.name));
+
+  grid.innerHTML = '';
+  filtered.forEach(ch => {
+    const prof = ch.data?.profile || {};
+    const name = prof.name || ch.name || '不明';
+    const furi = prof.furi || '';
+    const age = prof.age || '';
+    const sex = prof.sex || '';
+    const profession = prof.profession || '';
+    const isLost = prof.isLost;
+
+    // Avatar initials
+    const initials = name.replace(/[（(].*/, '').trim().slice(0,2);
+
+    // Abilities
+    const abChips = cfg.abilities.map(ab => {
+      const key = cfg.abilityKeys[ab];
+      const val = getAbilityValue(ch, key);
+      return `<div class="ability-chip">${ab} <b>${val}</b></div>`;
+    }).join('');
+
+    // Skills
+    const topSkills = getTopSkills(ch, hlNames);
+    const skillHtml = topSkills.map(s => {
+      const isHl = hlNames.has(s.name);
+      return `<span class="skill-pill${isHl ? ' highlight' : ''}">${s.name} ${s.val}</span>`;
+    }).join('');
+
+    const subParts = [];
+    if (furi) subParts.push(furi);
+    const meta = [age ? age + '歳' : '', sex].filter(Boolean).join('・');
+    if (meta) subParts.push(meta);
+    if (profession) subParts.push(profession);
+
+    const card = document.createElement('div');
+    card.className = 'char-card';
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="avatar">${initials}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="card-name">${isLost ? '<span class="lost-dot"></span>' : ''}${name}</div>
+          ${subParts.length ? `<div class="card-sub">${subParts.join(' ｜ ')}</div>` : ''}
+        </div>
+        <div class="ver-badge">${currentVer}版</div>
+      </div>
+      <div class="ability-chips">${abChips}</div>
+      <div class="skill-pills">${skillHtml || '<span style="font-size:11px;color:var(--text3);">技能データなし</span>'}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// Init
+renderAbilityFilters();
+</script>
+</body>
+</html>
