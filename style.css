@@ -8,7 +8,7 @@
     --text2: #b0b0c8;
     --text3: #7070a0;
     --accent: #7c6af7;
-    --accent2: #c4bbfc;
+    --accent2: #b090f0;
     --accent-bg: rgba(124,106,247,0.12);
     --green: #4ade80;
     --green-bg: rgba(74,222,128,0.1);
@@ -31,7 +31,7 @@
     --text2: #4a4a6a;
     --text3: #8888a8;
     --accent: #6254e8;
-    --accent2: #4a3ecf;
+    --accent2: #6a50d0;
     --accent-bg: rgba(98,84,232,0.08);
     --green: #16a34a;
     --green-bg: rgba(22,163,74,0.08);
@@ -74,6 +74,8 @@
     letter-spacing: 0.04em;
   }
   .header-title span { color: var(--text3); }
+  .header-icon { filter: invert(75%) sepia(50%) saturate(500%) hue-rotate(90deg) brightness(105%); }
+  :root.light .header-icon { filter: invert(35%) sepia(60%) saturate(600%) hue-rotate(100deg) brightness(90%); }
 
   .theme-btn {
     font-family: 'Shippori Mincho', serif;
