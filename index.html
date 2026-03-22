@@ -13,10 +13,10 @@
     --border: #2e2e3a;
     --border2: #3d3d50;
     --text: #e8e8f0;
-    --text2: #8888a0;
-    --text3: #55556a;
+    --text2: #b0b0c8;
+    --text3: #7070a0;
     --accent: #7c6af7;
-    --accent2: #a99ff8;
+    --accent2: #c4bbfc;
     --accent-bg: rgba(124,106,247,0.12);
     --green: #4ade80;
     --green-bg: rgba(74,222,128,0.1);
@@ -28,6 +28,27 @@
     --teal-bg: rgba(45,212,191,0.1);
     --radius: 8px;
     --radius-lg: 12px;
+  }
+  :root.light {
+    --bg: #f4f4f7;
+    --surface: #ffffff;
+    --surface2: #f0f0f4;
+    --border: #dddde8;
+    --border2: #c8c8d8;
+    --text: #1a1a2e;
+    --text2: #4a4a6a;
+    --text3: #8888a8;
+    --accent: #6254e8;
+    --accent2: #4a3ecf;
+    --accent-bg: rgba(98,84,232,0.08);
+    --green: #16a34a;
+    --green-bg: rgba(22,163,74,0.08);
+    --amber: #b45309;
+    --amber-bg: rgba(180,83,9,0.08);
+    --red: #dc2626;
+    --red-bg: rgba(220,38,38,0.08);
+    --teal: #0f766e;
+    --teal-bg: rgba(15,118,110,0.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -56,11 +77,25 @@
   }
   .header-title span { color: var(--text3); }
 
+  .theme-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: 8px;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent2); }
+
   /* Version tabs */
   .ver-tabs {
     display: flex;
     gap: 4px;
-    margin-left: auto;
+    width: 100%;
   }
   .ver-tab {
     font-family: 'Space Mono', monospace;
@@ -365,9 +400,9 @@
     font-size: 10px;
     padding: 2px 7px;
     border-radius: 20px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    color: var(--text3);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    color: var(--accent2);
     flex-shrink: 0;
   }
 
@@ -429,15 +464,20 @@
 
 <div class="header">
   <div class="header-title">CoC<span> / </span>character viewer</div>
-  <div class="ver-tabs">
-    <button class="ver-tab" data-ver="7">7版</button>
-    <button class="ver-tab active" data-ver="6">6版</button>
-  </div>
+  <button class="theme-btn" id="themeBtn">☀ ライト</button>
 </div>
 
 <div class="layout">
   <!-- Sidebar -->
   <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sec-label">バージョン</div>
+      <div class="ver-tabs" style="margin-left:0;">
+        <button class="ver-tab" data-ver="7" style="flex:1;text-align:center;">7版</button>
+        <button class="ver-tab active" data-ver="6" style="flex:1;text-align:center;">6版</button>
+      </div>
+    </div>
+
     <div class="sidebar-section">
       <div class="sec-label">キャラクター検索</div>
       <input type="text" class="search-input" id="nameSearch" placeholder="名前・フリガナ" />
@@ -659,6 +699,13 @@ function renderSkillTags() {
     container.appendChild(tag);
   });
 }
+
+// ===== Theme toggle =====
+const themeBtn = document.getElementById('themeBtn');
+themeBtn.addEventListener('click', () => {
+  const isLight = document.documentElement.classList.toggle('light');
+  themeBtn.textContent = isLight ? '☽ ダーク' : '☀ ライト';
+});
 
 // ===== Lost toggle =====
 const showLostCb = document.getElementById('showLost');
