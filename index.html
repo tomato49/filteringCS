@@ -568,33 +568,57 @@ function renderAbilityFilters() {
   });
 }
 
+// ===== 技能名の正規化（共通） =====
+function skillFullName(sk) {
+  const add = sk.additionalName || '';
+  return sk.name + (add ? '（' + add + '）' : '');
+}
+
 // ===== Skill select =====
+const CAT_LABELS = {
+  actionSkills: '行動技能',
+  battleSkills: '戦闘技能',
+  searchSkills: '探索技能',
+  knowledgeSkills: '知識技能',
+  negotiationSkills: '交渉技能'
+};
+const CAT_ORDER = ['actionSkills','battleSkills','searchSkills','knowledgeSkills','negotiationSkills'];
+
 function buildSkillSelect() {
   const sel = document.getElementById('skillSelect');
   sel.innerHTML = '<option value="">技能を選択...</option>';
-  const skills = collectAllSkills();
-  skills.sort().forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s;
-    opt.textContent = s;
-    sel.appendChild(opt);
+  const bycat = collectSkillsByCategory();
+  CAT_ORDER.forEach(cat => {
+    const names = bycat[cat];
+    if (!names || names.length === 0) return;
+    const grp = document.createElement('optgroup');
+    grp.label = CAT_LABELS[cat];
+    names.sort((a,b) => a.localeCompare(b, 'ja')).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
   });
 }
 
-function collectAllSkills() {
-  const names = new Set();
-  const filtered = allChars.filter(c => (c.data?.version || '7th').startsWith(currentVer));
-  filtered.forEach(ch => {
+function collectSkillsByCategory() {
+  const result = {};
+  CAT_ORDER.forEach(cat => result[cat] = new Set());
+  const chars = allChars.filter(c => (c.data?.version || '7th').startsWith(currentVer));
+  chars.forEach(ch => {
     const d = ch.data;
-    ['actionSkills','battleSkills','searchSkills','knowledgeSkills','negotiationSkills'].forEach(cat => {
+    CAT_ORDER.forEach(cat => {
       const skills = d[cat];
       if (!skills) return;
       [...(skills.static || []), ...(skills.additional || [])].forEach(sk => {
-        if (sk.name) names.add(sk.name + (sk.additionalName ? '（' + sk.additionalName + '）' : ''));
+        if (sk.name) result[cat].add(skillFullName(sk));
       });
     });
   });
-  return [...names];
+  CAT_ORDER.forEach(cat => result[cat] = [...result[cat]]);
+  return result;
 }
 
 // ===== Skill threshold =====
@@ -645,14 +669,12 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 // ===== Get skill value =====
 function getSkillValue(ch, rawName) {
   const d = ch.data;
-  const cats = ['actionSkills','battleSkills','searchSkills','knowledgeSkills','negotiationSkills'];
-  for (const cat of cats) {
+  for (const cat of CAT_ORDER) {
     const skills = d[cat];
     if (!skills) continue;
     const all = [...(skills.static || []), ...(skills.additional || [])];
     for (const sk of all) {
-      const fullName = sk.name + (sk.additionalName ? '（' + sk.additionalName + '）' : '');
-      if (fullName === rawName || sk.name === rawName) {
+      if (skillFullName(sk) === rawName) {
         return (sk.defaultPoint||0) + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
       }
     }
@@ -677,7 +699,7 @@ function getTopSkills(ch, highlightNames) {
     if (!skills) return;
     [...(skills.static||[]), ...(skills.additional||[])].forEach(sk => {
       const val = (sk.defaultPoint||0)+(sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0);
-      const fullName = sk.name + (sk.additionalName ? '（' + sk.additionalName + '）' : '');
+      const fullName = skillFullName(sk);
       // Only include if has meaningful points (not just default)
       if ((sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0) > 0) {
         all.push({ name: fullName, val });
