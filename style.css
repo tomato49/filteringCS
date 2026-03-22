@@ -131,6 +131,11 @@
     border-bottom: 1px solid var(--border);
   }
   .sidebar-section:last-child { border-bottom: none; }
+  .sec-label::before {
+    content: '✦ ';
+    font-size: 8px;
+    vertical-align: 1px;
+  }
   .sec-label {
     font-family: 'Shippori Mincho', serif;
     font-size: 11px;
