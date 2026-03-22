@@ -451,6 +451,7 @@
     background: var(--red-bg);
     border: 1px solid var(--red);
     color: var(--red);
+    display: inline-block;
   }
   .san-chip b { color: var(--red); font-weight: 700; }
   .card-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
@@ -469,8 +470,8 @@
 
   /* Ability chips */
   .ability-chips {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     gap: 4px;
     margin-bottom: 9px;
     position: relative;
@@ -485,8 +486,10 @@
     color: var(--text2);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    text-align: center;
   }
   .ability-chip b { color: var(--text); font-weight: 700; }
+  .db-chip { padding: 2px 3px; font-size: 9px; }
 
   /* Skill pills */
   .skill-pills { display: flex; flex-wrap: wrap; gap: 4px; position: relative; z-index: 1; }

@@ -343,7 +343,7 @@ function getSkillValue(ch, rawName) {
       if (match) {
         let val = sk.sumPoint !== undefined ? sk.sumPoint :
           (sk.defaultPoint||0) + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
-        // 能力値依存のデフォルト値計算
+        // Ability-based default value calculation
         if (sk.name === '母国語' && (sk.defaultPoint === undefined || sk.defaultPoint === 0)) {
           const edu = getAbilityValue(ch, 'edu');
           const base = edu * (currentVer === '7' ? 1 : 5);
@@ -379,7 +379,7 @@ function getTopSkills(ch, highlightNames) {
     [...(skills.static||[]), ...(skills.additional||[])].forEach(sk => {
       let val = sk.sumPoint !== undefined ? sk.sumPoint :
         (sk.defaultPoint||0)+(sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0);
-      // 能力値依存のデフォルト値計算
+      // Ability-based default value calculation
       if (sk.name === '母国語' && (sk.defaultPoint === undefined || sk.defaultPoint === 0)) {
         const edu = getAbilityValue(ch, 'edu');
         const base = edu * (currentVer === '7' ? 1 : 5);
@@ -481,6 +481,22 @@ function renderCards() {
       return `<div class="ability-chip">${ab} <b>${val}</b></div>`;
     }).join('');
 
+    // DB計算
+    const str = getAbilityValue(ch, 'str');
+    const siz = getAbilityValue(ch, 'siz');
+    const strSizRaw = currentVer === '7' ? Math.round(str / 5) + Math.round(siz / 5) : str + siz;
+    let db;
+    if (strSizRaw <= 12) db = '-1D6';
+    else if (strSizRaw <= 16) db = '-1D4';
+    else if (strSizRaw <= 24) db = '0';
+    else if (strSizRaw <= 32) db = '+1D4';
+    else if (strSizRaw <= 40) db = '+1D6';
+    else if (strSizRaw <= 56) db = '+2D6';
+    else if (strSizRaw <= 72) db = '+3D6';
+    else if (strSizRaw <= 88) db = '+4D6';
+    else db = '+5D6';
+    const dbChip = `<div class="ability-chip db-chip">DB <b>${db}</b></div>`;
+
     // Skills
     const topSkills = getTopSkills(ch, hlNames);
     const skillHtml = topSkills.map(s => {
@@ -512,10 +528,8 @@ function renderCards() {
           ${subParts.length ? `<div class="card-sub">${subParts.join(' ｜ ')}</div>` : ''}
         </div>
       </div>
-      <div class="ability-chips">
-        ${sanVal !== '' ? `<div class="san-chip">SAN <b>${sanVal}</b></div><div style="width:100%;"></div>` : ''}
-        ${abChips}
-      </div>
+      ${sanVal !== '' ? `<div style="margin-bottom:4px;margin-top:-4px;position:relative;z-index:1;"><div class="san-chip">SAN <b>${sanVal}</b></div></div>` : ''}
+      <div class="ability-chips">${abChips}${dbChip}</div>
       <div class="skill-pills">${skillHtml || '<span style="font-size:11px;color:var(--text3);">技能データなし</span>'}</div>
     `;
     if (iconUrl) {
