@@ -481,20 +481,22 @@
     gap: 4px;
     margin-bottom: 9px;
     position: relative;
+    z-index: 1;
   }
   .ability-chip {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
     padding: 2px 7px;
     border-radius: 4px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 3%, transparent);
     color: var(--text2);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
   .ability-chip b { color: var(--text); font-weight: 700; }
 
   /* Skill pills */
-  .skill-pills { display: flex; flex-wrap: wrap; gap: 4px; position: relative; }
+  .skill-pills { display: flex; flex-wrap: wrap; gap: 4px; position: relative; z-index: 1; }
   .skill-pill {
     font-size: 10px;
     padding: 2px 8px;
@@ -502,6 +504,8 @@
     background: var(--green-bg);
     border: 1px solid rgba(74,222,128,0.25);
     color: var(--green);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
   .skill-pill.highlight {
     background: var(--accent-bg);
@@ -516,6 +520,3 @@
     color: var(--text3);
     font-size: 13px;
   }
-
-
-
