@@ -48,7 +48,7 @@
     overflow: hidden;
   }
   body {
-    font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Shippori Mincho', serif;
     background: linear-gradient(135deg, #080810 0%, #1a0f2e 50%, #080f1a 100%);
     color: var(--text);
     font-size: 13px;
@@ -67,7 +67,7 @@
     background: var(--surface);
   }
   .header-title {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Shippori Mincho', serif;
     font-size: 15px;
     font-weight: 700;
     color: var(--accent2);
@@ -76,7 +76,7 @@
   .header-title span { color: var(--text3); }
 
   .theme-btn {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Shippori Mincho', serif;
     font-size: 11px;
     padding: 5px 12px;
     border-radius: 20px;
@@ -96,7 +96,7 @@
     width: 100%;
   }
   .ver-tab {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Shippori Mincho', serif;
     font-size: 12px;
     padding: 5px 14px;
     border-radius: 20px;
@@ -130,11 +130,11 @@
   }
   .sidebar-section:last-child { border-bottom: none; }
   .sec-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--text3);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text2);
     letter-spacing: 0.08em;
-    text-transform: uppercase;
     margin-bottom: 10px;
   }
 
@@ -145,7 +145,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     color: var(--text);
-    font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Shippori Mincho', serif;
     font-size: 12px;
     padding: 7px 10px;
     outline: none;
@@ -164,12 +164,12 @@
     margin-bottom: 5px;
   }
   .ability-name {
-    font-family: 'Space Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     color: var(--text2);
   }
   .ability-val {
-    font-family: 'Space Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     color: var(--accent2);
     min-width: 36px;
@@ -208,7 +208,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     color: var(--text);
-    font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Shippori Mincho', serif;
     font-size: 11px;
     padding: 6px 8px;
     outline: none;
@@ -232,7 +232,7 @@
   }
   .skill-dropdown.open { display: block; }
   .skill-dropdown-group {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Shippori Mincho', serif;
     font-size: 10px;
     color: var(--text3);
     padding: 6px 8px 3px;
@@ -252,7 +252,7 @@
     border: 1px solid var(--accent);
     border-radius: var(--radius);
     color: var(--accent2);
-    font-family: 'Space Mono', monospace;
+    font-family: 'Shippori Mincho', serif;
     font-size: 11px;
     padding: 6px 10px;
     cursor: pointer;
@@ -273,7 +273,7 @@
     white-space: nowrap;
   }
   .skill-thresh-val {
-    font-family: 'Space Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     color: var(--accent2);
     min-width: 28px;
@@ -308,7 +308,7 @@
     border: 1px solid var(--border2);
     border-radius: var(--radius);
     color: var(--text2);
-    font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Shippori Mincho', serif;
     font-size: 12px;
     padding: 7px;
     cursor: pointer;
@@ -327,7 +327,7 @@
     justify-content: space-between;
   }
   .result-count {
-    font-family: 'Space Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     color: var(--text3);
   }
@@ -344,7 +344,7 @@
     padding: 40px;
   }
   .paste-icon {
-    font-family: 'Space Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 36px;
     color: var(--border2);
   }
@@ -362,7 +362,7 @@
     border: 1px solid var(--border2);
     border-radius: var(--radius-lg);
     color: var(--text);
-    font-family: 'Space Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     padding: 12px;
     outline: none;
@@ -376,7 +376,7 @@
     border: 1px solid var(--accent);
     border-radius: var(--radius);
     color: var(--accent2);
-    font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Shippori Mincho', serif;
     font-size: 13px;
     font-weight: 500;
     padding: 8px 24px;
@@ -444,7 +444,7 @@
   }
   .card-name { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.3; }
   .san-chip {
-    font-family: 'Space Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
     padding: 2px 7px;
     border-radius: 4px;
@@ -455,7 +455,7 @@
   .san-chip b { color: var(--red); font-weight: 700; }
   .card-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
   .ver-badge {
-    font-family: 'Space Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
     padding: 2px 7px;
     border-radius: 20px;
@@ -476,7 +476,7 @@
     position: relative;
   }
   .ability-chip {
-    font-family: 'Space Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
     padding: 2px 7px;
     border-radius: 4px;

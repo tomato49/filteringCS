@@ -341,7 +341,18 @@ function getSkillValue(ch, rawName) {
     for (const sk of all) {
       const match = isGroup ? sk.name === rawName : skillFullName(sk) === rawName;
       if (match) {
-        const val = (sk.defaultPoint||0) + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
+        let val = sk.sumPoint !== undefined ? sk.sumPoint :
+          (sk.defaultPoint||0) + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
+        // 能力値依存のデフォルト値計算
+        if (sk.name === '母国語' && (sk.defaultPoint === undefined || sk.defaultPoint === 0)) {
+          const edu = getAbilityValue(ch, 'edu');
+          const base = edu * (currentVer === '7' ? 1 : 5);
+          val = base + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
+        } else if (sk.name === '回避' && (sk.defaultPoint === undefined || sk.defaultPoint === 0)) {
+          const dex = getAbilityValue(ch, 'dex');
+          const base = dex * (currentVer === '7' ? 1 : 2);
+          val = base + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
+        }
         if (best === null || val > best) best = val;
       }
     }
@@ -366,12 +377,23 @@ function getTopSkills(ch, highlightNames) {
     const skills = d[cat];
     if (!skills) return;
     [...(skills.static||[]), ...(skills.additional||[])].forEach(sk => {
-      const val = (sk.defaultPoint||0)+(sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0);
+      let val = sk.sumPoint !== undefined ? sk.sumPoint :
+        (sk.defaultPoint||0)+(sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0);
+      // 能力値依存のデフォルト値計算
+      if (sk.name === '母国語' && (sk.defaultPoint === undefined || sk.defaultPoint === 0)) {
+        const edu = getAbilityValue(ch, 'edu');
+        const base = edu * (currentVer === '7' ? 1 : 5);
+        val = base + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
+      } else if (sk.name === '回避' && (sk.defaultPoint === undefined || sk.defaultPoint === 0)) {
+        const dex = getAbilityValue(ch, 'dex');
+        const base = dex * (currentVer === '7' ? 1 : 2);
+        val = base + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
+      }
       const fullName = skillDisplayName(sk);
       const baseName = fullName.replace(/（.*）$/, '');
       const isHighlighted = highlightNames.has(fullName) || (GROUP_SKILLS.has(baseName) && highlightNames.has(baseName));
-      // フィルター対象技能は値に関わらず含める、それ以外はデフォルト以外の点がある場合のみ
-      if (isHighlighted || (sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0) > 0) {
+      const extraPoints = (sk.professionPoint||0)+(sk.interestPoint||0)+(sk.growthPoint||0)+(sk.otherPoint||0);
+      if (isHighlighted || extraPoints > 0 || (sk.sumPoint !== undefined && sk.sumPoint > (sk.defaultPoint||0))) {
         all.push({ name: fullName, val, isHighlighted });
       }
     });

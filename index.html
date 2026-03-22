@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Character Finder</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>探索者名簿</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -48,13 +48,13 @@
         <input type="text" class="skill-combo-input" id="skillComboInput" placeholder="技能を検索..." autocomplete="off" />
         <div class="skill-dropdown" id="skillDropdown"></div>
       </div>
-        <button class="add-btn" id="addSkillFilter" style="width:100%;text-align:center;">+ 追加</button>
       </div>
       <div class="skill-threshold-row">
         <span class="skill-thresh-label">閾値：</span>
         <input type="range" id="skillThreshold" min="0" max="100" value="50" step="1" style="flex:1;" />
         <span class="skill-thresh-val" id="skillThreshVal">50以上</span>
       </div>
+      <button class="add-btn" id="addSkillFilter" style="width:100%;text-align:center;margin-bottom:8px;">+ 追加</button>
       <div class="filter-tags" id="skillFilterTags"></div>
     </div>
 
@@ -75,7 +75,7 @@
   <div class="main">
     <div class="header">
       <div style="flex:1;"></div>
-      <div class="header-title">Call of Cthulhu<span> / </span>Character Finder</div>
+      <div class="header-title">Call of Cthulhu<span> / </span>探索者名簿</div>
       <div style="flex:1;display:flex;justify-content:flex-end;">
         <button class="theme-btn" id="themeBtn">☀ ライト</button>
       </div>
