@@ -428,8 +428,12 @@ function renderCards() {
     const profession = prof.profession || '';
     const isLost = prof.isLost;
 
-    // Avatar initials
+    // Avatar
     const initials = name.replace(/[（(].*/, '').trim().slice(0,2);
+    const iconUrl = prof.icons?.[0]?.url || '';
+    const avatarHtml = iconUrl
+      ? `<div class="avatar"><img src="${iconUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='${initials}';this.parentElement.style.fontSize='13px';" /></div>`
+      : `<div class="avatar">${initials}</div>`;
 
     // Abilities
     const abChips = cfg.abilities.map(ab => {
@@ -457,7 +461,7 @@ function renderCards() {
     card.className = 'char-card' + (isLost ? ' is-lost' : '');
     card.innerHTML = `
       <div class="card-top">
-        <div class="avatar">${initials}</div>
+        ${avatarHtml}
         <div style="flex:1;min-width:0;">
           <div class="card-name">${name}</div>
           ${subParts.length ? `<div class="card-sub">${subParts.join(' ｜ ')}</div>` : ''}
