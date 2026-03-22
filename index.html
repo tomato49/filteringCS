@@ -76,10 +76,12 @@
   <!-- Main -->
   <div class="main">
     <div class="header">
-      <div style="flex:1;"></div>
+      <div style="flex:1;display:flex;justify-content:flex-start;">
+        <button class="theme-btn" id="themeBtn">☀ ライト</button>
+      </div>
       <div class="header-title"><span style="font-size:14px;color:var(--accent2);">Call of Cthulhu</span><img src="icon.svg?v=2" class="header-icon" style="width:32px;height:32px;vertical-align:middle;margin:0 6px;"><span style="margin-right:6px;font-size:12px;">✦</span>探索者名簿<span style="margin-left:6px;font-size:12px;">✦</span></div>
       <div style="flex:1;display:flex;justify-content:flex-end;">
-        <button class="theme-btn" id="themeBtn">☀ ライト</button>
+        <button class="reset-btn" id="clearStorageBtn" style="margin-top:0;width:auto;padding:5px 12px;">保存データを削除</button>
       </div>
     </div>
     <div class="main-header">
@@ -98,5 +100,6 @@
 </div>
 
 <script src="app.js"></script>
+<div class="toast" id="toast"></div>
 </body>
 </html>

@@ -20,7 +20,45 @@ const VER_CONFIG = {
   }
 };
 
+// ===== Toast =====
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast' + (type ? ' ' + type : '');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ===== JSON最適化 =====
+function optimizeChars(chars) {
+  return chars.map(ch => {
+    const d = ch.data || {};
+    return {
+      id: ch.id,
+      data: {
+        version: d.version,
+        profile: d.profile,
+        abilities: d.abilities,
+        actionSkills: d.actionSkills,
+        battleSkills: d.battleSkills,
+        searchSkills: d.searchSkills,
+        knowledgeSkills: d.knowledgeSkills,
+        negotiationSkills: d.negotiationSkills,
+      }
+    };
+  });
+}
+
 // ===== Parse JSON =====
+function loadChars(parsed) {
+  allChars = parsed;
+  document.getElementById('pasteArea').style.display = 'none';
+  document.getElementById('cardGrid').style.display = 'grid';
+  buildSkillSelect();
+  renderAbilityFilters();
+  renderCards();
+}
+
 document.getElementById('parseBtn').addEventListener('click', () => {
   const raw = document.getElementById('jsonInput').value.trim();
   const errEl = document.getElementById('parseError');
@@ -28,12 +66,13 @@ document.getElementById('parseBtn').addEventListener('click', () => {
   try {
     let parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) parsed = [parsed];
-    allChars = parsed;
-    document.getElementById('pasteArea').style.display = 'none';
-    document.getElementById('cardGrid').style.display = 'grid';
-    buildSkillSelect();
-    renderAbilityFilters();
-    renderCards();
+    parsed = optimizeChars(parsed);
+    try {
+      localStorage.setItem('coc_chars', JSON.stringify(parsed));
+    } catch(e) {
+      showToast('データが大きすぎるため自動保存できませんでした', 'warning');
+    }
+    loadChars(parsed);
   } catch(e) {
     errEl.textContent = 'JSONの解析に失敗しました: ' + e.message;
   }
@@ -569,4 +608,23 @@ function renderCards() {
 
 // Init
 renderAbilityFilters();
+
+// localStorageから自動読み込み
+try {
+  const saved = localStorage.getItem('coc_chars');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    loadChars(parsed);
+  }
+} catch(e) {}
+
+// データクリアボタン
+document.getElementById('clearStorageBtn')?.addEventListener('click', () => {
+  localStorage.removeItem('coc_chars');
+  allChars = [];
+  document.getElementById('pasteArea').style.display = 'flex';
+  document.getElementById('cardGrid').style.display = 'none';
+  document.getElementById('jsonInput').value = '';
+  document.getElementById('resultCount').textContent = 'データなし';
+});
 
