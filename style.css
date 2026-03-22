@@ -14,6 +14,10 @@
     --skill-bg: rgba(74,222,128,0.1);
     --red: #e05555;
     --red-bg: rgba(248,113,113,0.1);
+    --derived: #ea8c00;
+    --derived-bg: rgba(234,140,0,0.1);
+    --derived: #ea8c00;
+    --derived-bg: rgba(234,140,0,0.1);
     --radius: 8px;
     --radius-lg: 12px;
   }
@@ -33,6 +37,10 @@
     --skill-bg: rgba(15,118,110,0.08);
     --red: #dc2626;
     --red-bg: rgba(220,38,38,0.08);
+    --derived: #a07000;
+    --derived-bg: rgba(160,112,0,0.08);
+    --derived: #a07000;
+    --derived-bg: rgba(160,112,0,0.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
@@ -445,7 +453,7 @@
   .card-name { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.3; }
   .san-chip {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
+    font-size: 12px;
     padding: 2px 7px;
     border-radius: 4px;
     background: var(--red-bg);
@@ -454,6 +462,18 @@
     display: inline-block;
   }
   .san-chip b { color: var(--red); font-weight: 700; }
+  .derived-chip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--surface) 3%, transparent);
+    color: var(--text2);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: inline-block;
+  }
+  .derived-chip b { color: var(--text); font-weight: 700; }
   .card-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
   .ver-badge {
     font-family: 'IBM Plex Mono', monospace;
@@ -489,7 +509,6 @@
     text-align: center;
   }
   .ability-chip b { color: var(--text); font-weight: 700; }
-  .db-chip { padding: 2px 3px; font-size: 9px; }
 
   /* Skill pills */
   .skill-pills { display: flex; flex-wrap: wrap; gap: 4px; position: relative; z-index: 1; }

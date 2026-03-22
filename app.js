@@ -495,7 +495,11 @@ function renderCards() {
     else if (strSizRaw <= 72) db = '+3D6';
     else if (strSizRaw <= 88) db = '+4D6';
     else db = '+5D6';
-    const dbChip = `<div class="ability-chip db-chip">DB <b>${db}</b></div>`;
+    // HP・MP計算
+    const con = getAbilityValue(ch, 'con');
+    const pow = getAbilityValue(ch, 'pow');
+    const hp = Math.ceil((con + siz) / (currentVer === '7' ? 10 : 2));
+    const mp = currentVer === '7' ? Math.round(pow / 5) : pow;
 
     // Skills
     const topSkills = getTopSkills(ch, hlNames);
@@ -528,8 +532,13 @@ function renderCards() {
           ${subParts.length ? `<div class="card-sub">${subParts.join(' ｜ ')}</div>` : ''}
         </div>
       </div>
-      ${sanVal !== '' ? `<div style="margin-bottom:4px;margin-top:-4px;position:relative;z-index:1;"><div class="san-chip">SAN <b>${sanVal}</b></div></div>` : ''}
-      <div class="ability-chips">${abChips}${dbChip}</div>
+      ${sanVal !== '' || true ? `<div style="display:flex;gap:4px;margin-bottom:4px;margin-top:-4px;position:relative;z-index:1;">
+        ${sanVal !== '' ? `<div class="san-chip">SAN <b>${sanVal}</b></div>` : ''}
+        <div class="derived-chip">HP <b>${hp}</b></div>
+        <div class="derived-chip">MP <b>${mp}</b></div>
+        <div class="derived-chip">DB <b>${db}</b></div>
+      </div>` : ''}
+      <div class="ability-chips">${abChips}</div>
       <div class="skill-pills">${skillHtml || '<span style="font-size:11px;color:var(--text3);">技能データなし</span>'}</div>
     `;
     if (iconUrl) {
