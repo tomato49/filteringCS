@@ -501,6 +501,20 @@ function renderCards() {
     const hp = Math.ceil((con + siz) / (currentVer === '7' ? 10 : 2));
     const mp = currentVer === '7' ? Math.round(pow / 5) : pow;
 
+    // MOV計算（7版のみ）
+    let movChip = '';
+    if (currentVer === '7') {
+      const dex = getAbilityValue(ch, 'dex');
+      const strVal = Math.round(str / 5);
+      const dexVal = Math.round(dex / 5);
+      const sizVal = Math.round(siz / 5);
+      let mov;
+      if (strVal < sizVal && dexVal < sizVal) mov = 7;
+      else if (strVal > sizVal && dexVal > sizVal) mov = 9;
+      else mov = 8;
+      movChip = `<div class="ability-chip">MOV <b>${mov}</b></div>`;
+    }
+
     // Skills
     const topSkills = getTopSkills(ch, hlNames);
     const skillHtml = topSkills.map(s => {
@@ -538,7 +552,7 @@ function renderCards() {
         <div class="derived-chip">MP <b>${mp}</b></div>
         <div class="derived-chip">DB <b>${db}</b></div>
       </div>` : ''}
-      <div class="ability-chips">${abChips}</div>
+      <div class="ability-chips">${abChips}${movChip}</div>
       <div class="skill-pills">${skillHtml || '<span style="font-size:11px;color:var(--text3);">技能データなし</span>'}</div>
     `;
     if (iconUrl) {
