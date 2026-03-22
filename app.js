@@ -428,12 +428,12 @@ function renderCards() {
     const profession = prof.profession || '';
     const isLost = prof.isLost;
 
-    // Avatar
+    // Card background image
     const initials = name.replace(/[（(].*/, '').trim().slice(0,2);
     const iconUrl = prof.icons?.[0]?.url || '';
-    const avatarHtml = iconUrl
-      ? `<div class="avatar"><img src="${iconUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='${initials}';this.parentElement.style.fontSize='13px';" /></div>`
-      : `<div class="avatar">${initials}</div>`;
+    const cardBgHtml = iconUrl
+      ? `<img class="card-bg" src="${iconUrl}" alt="" referrerpolicy="no-referrer" />`
+      : '';
 
     // Abilities
     const abChips = cfg.abilities.map(ab => {
@@ -461,19 +461,29 @@ function renderCards() {
     card.className = 'char-card' + (isLost ? ' is-lost' : '');
     card.innerHTML = `
       <div class="card-top">
-        ${avatarHtml}
         <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+            <div class="ver-badge">${currentVer}版</div>
+            <a href="https://iachara.com/view/${ch.id}" target="_blank" rel="noopener" title="キャラクターページを開く" style="display:flex;align-items:center;gap:3px;color:var(--text3);text-decoration:none;transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'">
+              <span style="font-size:10px;">いあきゃらへ</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
           <div class="card-name">${name}</div>
           ${subParts.length ? `<div class="card-sub">${subParts.join(' ｜ ')}</div>` : ''}
         </div>
-        <div class="ver-badge">${currentVer}版</div>
-        <a href="https://iachara.com/view/${ch.id}" target="_blank" rel="noopener" title="キャラクターページを開く" style="display:flex;align-items:center;color:var(--text3);text-decoration:none;margin-left:4px;flex-shrink:0;transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        </a>
       </div>
       <div class="ability-chips">${abChips}</div>
       <div class="skill-pills">${skillHtml || '<span style="font-size:11px;color:var(--text3);">技能データなし</span>'}</div>
     `;
+    if (iconUrl) {
+      const bg = document.createElement('img');
+      bg.className = 'card-bg';
+      bg.src = iconUrl;
+      bg.setAttribute('referrerpolicy', 'no-referrer');
+      bg.setAttribute('alt', '');
+      card.appendChild(bg);
+    }
     grid.appendChild(card);
   });
 }
