@@ -389,7 +389,7 @@ function getSkillValue(ch, rawName) {
           val = base + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
         } else if (sk.name === '回避' && (sk.defaultPoint === undefined || sk.defaultPoint === 0)) {
           const dex = getAbilityValue(ch, 'dex');
-          const base = dex * (currentVer === '7' ? 1 : 2);
+          const base = currentVer === '7' ? Math.floor(dex / 2) : dex * 2;
           val = base + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
         }
         if (best === null || val > best) best = val;
@@ -425,7 +425,7 @@ function getTopSkills(ch, highlightNames) {
         val = base + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
       } else if (sk.name === '回避' && (sk.defaultPoint === undefined || sk.defaultPoint === 0)) {
         const dex = getAbilityValue(ch, 'dex');
-        const base = dex * (currentVer === '7' ? 1 : 2);
+        const base = currentVer === '7' ? Math.floor(dex / 2) : dex * 2;
         val = base + (sk.professionPoint||0) + (sk.interestPoint||0) + (sk.growthPoint||0) + (sk.otherPoint||0);
       }
       const fullName = skillDisplayName(sk);
@@ -523,35 +523,42 @@ function renderCards() {
     // DB計算
     const str = getAbilityValue(ch, 'str');
     const siz = getAbilityValue(ch, 'siz');
-    const strSizRaw = currentVer === '7' ? Math.round(str / 5) + Math.round(siz / 5) : str + siz;
-    let db;
-    if (strSizRaw <= 12) db = '-1D6';
-    else if (strSizRaw <= 16) db = '-1D4';
-    else if (strSizRaw <= 24) db = '0';
-    else if (strSizRaw <= 32) db = '+1D4';
-    else if (strSizRaw <= 40) db = '+1D6';
-    else if (strSizRaw <= 56) db = '+2D6';
-    else if (strSizRaw <= 72) db = '+3D6';
-    else if (strSizRaw <= 88) db = '+4D6';
-    else db = '+5D6';
     // HP・MP計算
     const con = getAbilityValue(ch, 'con');
     const pow = getAbilityValue(ch, 'pow');
     const hp = Math.ceil((con + siz) / (currentVer === '7' ? 10 : 2));
-    const mp = currentVer === '7' ? Math.round(pow / 5) : pow;
+    const mp = currentVer === '7' ? Math.floor(pow / 5) : pow;
 
     // MOV計算（7版のみ）
     let movChip = '';
     if (currentVer === '7') {
       const dex = getAbilityValue(ch, 'dex');
-      const strVal = Math.round(str / 5);
-      const dexVal = Math.round(dex / 5);
-      const sizVal = Math.round(siz / 5);
       let mov;
-      if (strVal < sizVal && dexVal < sizVal) mov = 7;
-      else if (strVal > sizVal && dexVal > sizVal) mov = 9;
+      if (str < siz && dex < siz) mov = 7;
+      else if (str > siz && dex > siz) mov = 9;
       else mov = 8;
       movChip = `<div class="ability-chip">MOV <b>${mov}</b></div>`;
+    }
+
+    // DB計算
+    const strSizRaw = currentVer === '7' ? str + siz : str + siz;
+    let db;
+    if (currentVer === '7') {
+      if (strSizRaw <= 64) db = '-2';
+      else if (strSizRaw <= 84) db = '-1';
+      else if (strSizRaw <= 124) db = '0';
+      else if (strSizRaw <= 164) db = '+1D4';
+      else db = '+1D6';
+    } else {
+      if (strSizRaw <= 12) db = '-1D6';
+      else if (strSizRaw <= 16) db = '-1D4';
+      else if (strSizRaw <= 24) db = '0';
+      else if (strSizRaw <= 32) db = '+1D4';
+      else if (strSizRaw <= 40) db = '+1D6';
+      else if (strSizRaw <= 56) db = '+2D6';
+      else if (strSizRaw <= 72) db = '+3D6';
+      else if (strSizRaw <= 88) db = '+4D6';
+      else db = '+5D6';
     }
 
     // Skills
