@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CoC ✦ 探索者名簿</title>
+<title>探索者名簿</title>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700&family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐙</text></svg>">
 <link rel="icon" href="icon.svg?v=2" type="image/svg+xml">
@@ -14,14 +14,6 @@
 <div class="layout">
   <!-- Sidebar -->
   <div class="sidebar">
-    <div class="sidebar-section">
-      <div class="sec-label">バージョン</div>
-      <div class="ver-tabs" style="margin-left:0;">
-        <button class="ver-tab" data-ver="7" style="flex:1;text-align:center;">7版</button>
-        <button class="ver-tab active" data-ver="6" style="flex:1;text-align:center;">6版</button>
-      </div>
-    </div>
-
     <div class="sidebar-section">
       <div class="sec-label">キャラクター検索</div>
       <input type="text" class="search-input" id="nameSearch" placeholder="名前・フリガナ" />
@@ -76,7 +68,11 @@
   <!-- Main -->
   <div class="main">
     <div class="header">
-      <div style="flex:1;display:flex;justify-content:flex-start;">
+      <div style="flex:1;display:flex;align-items:center;gap:8px;justify-content:flex-start;">
+        <div class="ver-tabs" style="width:auto;">
+          <button class="ver-tab" data-ver="7" style="font-size:14px;padding:6px 18px;">7版</button>
+          <button class="ver-tab active" data-ver="6" style="font-size:14px;padding:6px 18px;">6版</button>
+        </div>
         <button class="theme-btn" id="themeBtn">☀ ライト</button>
       </div>
       <div class="header-title"><span style="font-size:14px;color:var(--accent2);">Call of Cthulhu</span><img src="icon.svg?v=2" class="header-icon" style="width:32px;height:32px;vertical-align:middle;margin:0 6px;"><span style="margin-right:6px;font-size:12px;">✦</span>探索者名簿<span style="margin-left:6px;font-size:12px;">✦</span></div>
