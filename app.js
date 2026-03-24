@@ -84,6 +84,7 @@ document.querySelectorAll('.ver-tab').forEach(btn => {
     currentVer = btn.dataset.ver;
     document.querySelectorAll('.ver-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    localStorage.setItem('coc_ver', currentVer);
     abilityMinMap = {};
     skillFilters = [];
     document.getElementById('skillFilterTags').innerHTML = '';
@@ -617,11 +618,19 @@ function renderCards() {
 // Init
 renderAbilityFilters();
 
-// テーマ復元
+// テーマ・バージョン復元
 const savedTheme = localStorage.getItem('coc_theme');
 if (savedTheme === 'light') {
   document.documentElement.classList.add('light');
   document.getElementById('themeBtn').textContent = '☽ ダーク';
+}
+const savedVer = localStorage.getItem('coc_ver');
+if (savedVer && savedVer !== currentVer) {
+  currentVer = savedVer;
+  document.querySelectorAll('.ver-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.ver === currentVer);
+  });
+  renderAbilityFilters();
 }
 
 // localStorageから自動読み込み
