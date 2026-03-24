@@ -340,6 +340,7 @@ const themeBtn = document.getElementById('themeBtn');
 themeBtn.addEventListener('click', () => {
   const isLight = document.documentElement.classList.toggle('light');
   themeBtn.textContent = isLight ? '☽ ダーク' : '☀ ライト';
+  localStorage.setItem('coc_theme', isLight ? 'light' : 'dark');
 });
 
 // ===== Lost toggle =====
@@ -615,6 +616,13 @@ function renderCards() {
 
 // Init
 renderAbilityFilters();
+
+// テーマ復元
+const savedTheme = localStorage.getItem('coc_theme');
+if (savedTheme === 'light') {
+  document.documentElement.classList.add('light');
+  document.getElementById('themeBtn').textContent = '☽ ダーク';
+}
 
 // localStorageから自動読み込み
 try {
