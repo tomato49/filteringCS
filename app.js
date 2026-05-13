@@ -642,6 +642,31 @@ try {
   }
 } catch(e) {}
 
+// ===== Lightbox =====
+function openLightbox(src, alt) {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  img.src = src;
+  img.alt = alt;
+  lb.classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+// ===== Help Modal =====
+function openHelp() {
+  document.getElementById('helpOverlay').classList.add('open');
+}
+function closeHelp() {
+  document.getElementById('helpOverlay').classList.remove('open');
+}
+
+document.getElementById('helpBtn')?.addEventListener('click', openHelp);
+document.getElementById('helpClose')?.addEventListener('click', closeHelp);
+document.getElementById('helpOverlay')?.addEventListener('click', closeHelp);
+document.querySelector('.help-modal')?.addEventListener('click', e => e.stopPropagation());
+
 // データクリアボタン
 document.getElementById('clearStorageBtn')?.addEventListener('click', () => {
   localStorage.removeItem('coc_chars');

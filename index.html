@@ -76,7 +76,8 @@
         <button class="theme-btn" id="themeBtn">☀ ライト</button>
       </div>
       <div class="header-title"><span style="font-size:14px;color:var(--accent2);">Call of Cthulhu</span><img src="icon.svg?v=2" class="header-icon" style="width:32px;height:32px;vertical-align:middle;margin:0 6px;"><span style="margin-right:6px;font-size:12px;">✦</span>探索者名簿<span style="margin-left:6px;font-size:12px;">✦</span></div>
-      <div style="flex:1;display:flex;justify-content:flex-end;">
+      <div style="flex:1;display:flex;justify-content:flex-end;align-items:center;gap:8px;">
+        <button class="help-btn" id="helpBtn" data-tooltip="ツールの使い方">?</button>
         <button class="reset-btn" id="clearStorageBtn" style="margin-top:0;width:auto;padding:5px 12px;">保存データを削除</button>
       </div>
     </div>
@@ -84,12 +85,63 @@
       <span class="result-count" id="resultCount">データなし</span>
     </div>
     <div id="pasteArea" class="paste-area">
-      <div class="paste-icon">{  }</div>
-      <div class="paste-title">JSONを貼り付けてください</div>
-      <div class="paste-sub">キャラクターデータ（配列またはオブジェクト）を<br>テキストエリアに貼り付けてパースします</div>
-      <textarea class="paste-textarea" id="jsonInput" placeholder='[{ "id": ..., "data": { ... } }, ...]'></textarea>
-      <div class="paste-error" id="parseError"></div>
-      <button class="parse-btn" id="parseBtn">読み込む</button>
+
+      <!-- JSON取得ガイド -->
+      <div class="guide-card">
+        <div class="guide-card-title">✦ いあきゃらからJSONを取得する方法</div>
+        <div class="guide-steps">
+          <div class="guide-step">
+            <div class="guide-step-num">1.</div>
+            <div class="guide-step-body">
+              <div class="guide-step-title"><a href="https://iachara.com" target="_blank" rel="noopener" class="guide-link">iachara.com</a> でマイページを開き、<kbd class="guide-kbd">F12</kbd> で開発者ツールを起動する</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">2.</div>
+            <div class="guide-step-body">
+              <div class="guide-step-title"><span class="guide-tag">ネットワーク</span> タブを選択し、画面を更新する</div>
+              <div class="guide-step-sub"><span class="guide-tag">Fetch/XHR</span> ボタンを押してフィルタを掛けると探しやすい</div>
+            </div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">3.</div>
+            <div class="guide-step-body">
+              <div class="guide-step-title">リストに表示された <span class="guide-tag">charasheet</span> を選択し、<span class="guide-tag">レスポンス</span> タブを開いてJSONが表示されていることを確認する</div>
+              <div class="guide-step-sub"><span class="guide-tag">charasheet</span> が2つ表示される場合がありますが、どちらを選んでも同じデータが取得できます</div>
+            </div>
+          </div>
+          <div class="guide-step guide-step-img">
+            <img src="image/devtool01.png" alt="charasheeetを選択してレスポンスタブを開いた状態" class="guide-img-thumb" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">4.</div>
+            <div class="guide-step-body">
+              <div class="guide-step-title">レスポンスタブ内の任意の場所をクリックしてから、<kbd class="guide-kbd">Ctrl</kbd> + <kbd class="guide-kbd">A</kbd> で全選択して <kbd class="guide-kbd">Ctrl</kbd> + <kbd class="guide-kbd">C</kbd> でコピーする</div>
+              <div class="guide-step-sub">画面下部に「○○ 行、○○ 文字が選択されています」と表示されれば成功</div>
+            </div>
+          </div>
+          <div class="guide-step guide-step-img">
+            <img src="image/devtool02.png" alt="全選択した状態" class="guide-img-thumb" onclick="openLightbox(this.src, this.alt)" />
+          </div>
+          <div class="guide-step">
+            <div class="guide-step-num">5.</div>
+            <div class="guide-step-body">
+              <div class="guide-step-title">コピーしたJSONを右のテキストエリアに貼り付け、「読み込む」をクリック</div>
+              <div class="guide-step-sub" style="color:var(--text3);font-size:11px;">データはブラウザのlocalStorageに自動保存されます。次回以降は貼り付け不要です。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="paste-input-area">
+        <div class="paste-icon">{  }</div>
+        <div class="paste-title">JSONを貼り付けてください</div>
+        <div class="paste-sub">キャラクターデータ（配列またはオブジェクト）を<br>テキストエリアに貼り付けてパースします</div>
+        <textarea class="paste-textarea" id="jsonInput" placeholder='[{ "id": ..., "data": { ... } }, ...]'></textarea>
+        <div class="paste-error" id="parseError"></div>
+        <button class="parse-btn" id="parseBtn">読み込む</button>
+      </div>
+
     </div>
     <div id="cardGrid" class="card-grid" style="display:none;"></div>
   </div>
@@ -97,5 +149,83 @@
 
 <script src="app.js"></script>
 <div class="toast" id="toast"></div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕ 閉じる</button>
+  <img id="lightboxImg" src="" alt="" onclick="event.stopPropagation()" />
+</div>
+
+<!-- Help Modal -->
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-modal">
+    <div class="help-modal-header">
+      <span class="help-modal-title">✦ 使い方ガイド</span>
+      <button class="help-modal-close" id="helpClose" onclick="closeHelp()">✕</button>
+    </div>
+    <div class="help-modal-body">
+
+      <div class="help-section">
+        <div class="help-section-label">版の切り替え</div>
+        <div class="help-section-content">
+          ヘッダー左の <span class="help-badge">7版</span> <span class="help-badge">6版</span> タブで切り替えます。版ごとに能力値の体系・スケールが異なるため、フィルター条件と技能フィルターはリセットされます。
+        </div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-label">キャラクター検索</div>
+        <div class="help-section-content">
+          サイドバー上部の検索欄に名前またはフリガナの一部を入力すると部分一致する探索者のみ表示されます。
+        </div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-label">正気度・能力値フィルター</div>
+        <div class="help-section-content">
+          各スライダーを右に動かすと「指定値以上」の探索者のみ表示されます。<span class="help-mono">指定なし</span>（値 0）の場合はフィルター無効です。6版の能力値は3d6スケール（最大18〜21）、7版は百分率スケール（最大90〜99）です。
+        </div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-label">技能フィルター</div>
+        <div class="help-section-content">
+          技能名を検索欄から選択し、閾値スライダーで最低値を設定してから「＋ 追加」をクリックします。複数の技能を同時に指定でき、<strong>すべての条件を満たす</strong>探索者のみ表示されます。追加済みのタグの <span class="help-mono">×</span> で個別削除できます。<br>
+          <strong>【操縦・芸術・製作・運転・近接戦闘・射撃・言語・科学・母国語】</strong>は例えば<span class="help-mono">芸術</span>で指定すると<span class="help-mono">芸術(料理)、芸術(演奏)、芸術(絵画)...</span>を一括照合します。
+        </div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-label">ロスト探索者の表示</div>
+        <div class="help-section-content">
+          サイドバー下部のトグルで、<span class="help-red">ロスト</span>フラグが立った探索者の表示／非表示を切り替えます。ロストカードは左端に赤いボーダーが付きます。
+        </div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-label">データの保存・削除</div>
+        <div class="help-section-content">
+          読み込んだJSONはブラウザの <span class="help-mono">localStorage</span> に自動保存され、次回アクセス時に自動復元されます。<br>
+          データが大きすぎる場合はアラートが表示され、保存できません。（400キャラ程度なら保存可能）<br>
+          データを更新する場合はヘッダー右の <span class="help-badge">保存データを削除</span> ボタンで保存済みデータを消去し、初期画面でいあきゃらデータを再入力してください。
+        </div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-label">テーマ切り替え</div>
+        <div class="help-section-content">
+          ヘッダーの <span class="help-mono">☀ ライト</span> ／ <span class="help-mono">☽ ダーク</span> ボタンでカラーテーマを切り替えます。
+        </div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-label">その他</div>
+        <div class="help-section-content">
+          問題や要望がある場合はX（旧Twitter）で <a href="https://x.com/ac8_e9" target="_blank" rel="noopener" class="guide-link">@ac8_e9 トマト🍅</a> までご連絡ください。
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>
